@@ -18,6 +18,10 @@
   <sub><em>If HushGram makes Instagram better for you, a coffee helps me keep testing patches and maintaining them as Instagram changes.</em></sub>
 </p>
 
+> [!NOTE]
+> **Fork de [SysAdminDoc/HushGram](https://github.com/SysAdminDoc/HushGram).** Le bundle `.mpp` de ce fork est compilé par GitHub Actions directement à partir de ce code source (voir `.github/workflows/build-bundle.yml`), et `patches-bundle.json` pointe vers la release de ce fork. Source Morphe : `github.com/abyssano78/HushGram`.
+> Différence avec l'original : **Install next to Instagram** est activé par défaut, pour installer l'app sous un autre nom de paquet que `com.instagram.android`.
+
 # <img src="assets/icon.png" width="36" alt=""> HushGram
 
 HushGram is a set of [Morphe](https://morphe.software) patches for Instagram on Android. You bring the Instagram APK, Morphe Manager patches it on your phone, and you get an Instagram with a settings screen full of switches the stock app doesn't have. Hide ads, suggested posts and Meta AI. Strip tracking tags from the links you share. Watch stories and lives without landing on the viewer list. Save reels, stories, photos and voice messages, lock your chats, rearrange the tab bar and a lot more.

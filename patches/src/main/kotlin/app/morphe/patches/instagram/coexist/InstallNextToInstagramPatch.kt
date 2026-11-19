@@ -72,7 +72,7 @@ val installNextToInstagramPatch = bytecodePatch(
     description = "Installs this build as a second Instagram beside your normal one, with its own data and sign-in. " +
         "Pick its package name and app name in the patch's options, and whether its icon gets a HushGram badge. " +
         "Works as soon as you patch it in, with no switch.",
-    default = false,
+    default = true,
 ) {
     category("Updates")
     dependsOn(instagramExtensionPatch, cloneManifestPatch)
