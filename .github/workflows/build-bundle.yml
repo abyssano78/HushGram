@@ -22,8 +22,13 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Windows, because gradle/verification-metadata.xml pins the checksums of the Windows build
+    # tools (aapt2) the upstream author builds with; every dependency stays checksum-verified.
+    runs-on: windows-latest
     timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v5
 
@@ -36,15 +41,16 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash ./gradlew --no-daemon :patches:buildAndroid
+        shell: pwsh
+        run: ./gradlew.bat --no-daemon :patches:buildAndroid
 
       - name: Locate the bundle
         id: bundle
         run: |
-          version=$(grep -E '^version *=' gradle.properties | sed -E 's/^version *= *//')
+          version=$(grep -E '^version *=' gradle.properties | sed -E 's/^version *= *//' | tr -d '\r')
           file="patches/build/release/patches-${version}.mpp"
           test -s "$file"
-          unzip -l "$file" | grep -q 'classes.dex' || { echo "bundle has no classes.dex"; exit 1; }
+          python -c "import zipfile,sys; sys.exit(0 if 'classes.dex' in zipfile.ZipFile(sys.argv[1]).namelist() else 'bundle has no classes.dex')" "$file"
           sha256sum "$file" | tee "$file.sha256"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "file=$file" >> "$GITHUB_OUTPUT"
@@ -70,7 +76,7 @@ jobs:
             --title "HushGram ${VERSION} (built from ${short})" \
             --notes "Built by GitHub Actions from commit ${GITHUB_SHA} of ${GITHUB_REPOSITORY}. SHA-256: $(cut -d' ' -f1 "$FILE.sha256")" \
             --target "$GITHUB_SHA"
-          python3 - "$tag" "$name" <<'PY'
+          python - "$tag" "$name" <<'PY'
           import json, sys, datetime, os
           tag, name = sys.argv[1], sys.argv[2]
           repo = os.environ["GITHUB_REPOSITORY"]
