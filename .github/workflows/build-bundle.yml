@@ -55,7 +55,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "file=$file" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: hushgram-${{ steps.bundle.outputs.version }}-${{ github.sha }}
           path: |
@@ -72,7 +72,7 @@ jobs:
           short=$(git rev-parse --short HEAD)
           tag="v${VERSION}-fork.${short}"
           name=$(basename "$FILE")
-          gh release create "$tag" "$FILE" "$FILE.sha256" \
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" "$FILE" "$FILE.sha256" \
             --title "HushGram ${VERSION} (built from ${short})" \
             --notes "Built by GitHub Actions from commit ${GITHUB_SHA} of ${GITHUB_REPOSITORY}. SHA-256: $(cut -d' ' -f1 "$FILE.sha256")" \
             --target "$GITHUB_SHA"
@@ -80,12 +80,12 @@ jobs:
           import json, sys, datetime, os
           tag, name = sys.argv[1], sys.argv[2]
           repo = os.environ["GITHUB_REPOSITORY"]
-          with open("patches-bundle.json") as f:
+          with open("patches-bundle.json", encoding="utf-8") as f:
               data = json.load(f)
           data["download_url"] = f"https://github.com/{repo}/releases/download/{tag}/{name}"
           data["signature_download_url"] = ""
-          data["created_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
-          with open("patches-bundle.json", "w") as f:
+          data["created_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+          with open("patches-bundle.json", "w", encoding="utf-8", newline="\n") as f:
               json.dump(data, f, indent=2, ensure_ascii=False)
               f.write("\n")
           PY
